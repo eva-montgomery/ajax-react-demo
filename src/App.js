@@ -12,7 +12,9 @@ import './App.css';
 import axios from 'axios';
 const API_ENDPOINT = 'https://swapi.co/api/people/1/';
 
-
+function urlForId(id) {
+  return `https://swapi.co/api/people/${id}/`;
+}
 
 
 
@@ -25,16 +27,55 @@ const API_ENDPOINT = 'https://swapi.co/api/people/1/';
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      name: 'not their real name at all'
+      name: '',
+      currentId: 15
     }
   }
 
   componentDidMount() {
     // This is the method that react calls after the component has been attached to the DOM as a real element
     // This is the first React method where it is safe to call this.setState
-    axios.get(API_ENDPOINT)
+  //   axios.get(urlForId(this.state.currentId))
+  //     .then(response => {
+  //       console.log(response.data.name);
+  //       // name = response.data.name;
+  //       this.setState({
+  //         name: response.data.name
+  //       })
+  //   })
+  this._makeAjaxRequest();
+  }
+
+
+  render () {
+
+    return (
+      <div className="App">
+        <header className="App-header">
+          {
+          this.state.name || <img src={logo} />
+          }
+          <button onClick={this._getNextCharacter}>
+            💥💥💥
+          </button>
+        </header>
+      </div>
+    );
+  }
+
+
+_getNextCharacter = () => {
+  this.setState({
+    currentId: this.state.currentId + 1
+  }, () => {
+    console.log(`New currentId is ${this.state.currentId}`);
+    this._makeAjaxRequest();
+  });
+}
+
+_makeAjaxRequest = () => {
+  axios.get(urlForId(this.state.currentId))
       .then(response => {
         console.log(response.data.name);
         // name = response.data.name;
@@ -42,19 +83,14 @@ class App extends React.Component {
           name: response.data.name
         })
     })
-  }
-
-  render () {
-
-    return (
-      <div className="App">
-        <header className="App-header">
-          {this.state.name}
-        </header>
-      </div>
-    );
+    .catch(err => {
+      this._getNextCharacter();
+    })
   }
 }
+
+
+
 
 
 export default App;
